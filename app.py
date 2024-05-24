@@ -17,14 +17,19 @@ st.set_page_config(page_title="Entity-Sentiment Analysis",
                    page_icon="🤗")
 
 
-def download_en_core_web_sm():
-    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"], check=True)
+from spacy.cli.download import download as spacy_download
 
 # Cache the function to prevent re-downloading the model
 @st.cache_resource
 def load_model():
-    download_en_core_web_sm()
-    return spacy.load("en_core_web_sm")
+    # Attempt to load the model
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except OSError:
+        # If the model is not found, download and then load it
+        spacy_download("en_core_web_sm")
+        nlp = spacy.load("en_core_web_sm")
+    return nlp
 
 
 def main():
@@ -117,6 +122,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
 
