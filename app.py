@@ -46,10 +46,15 @@ def main():
 
         @st.cache_resource()
         def get_model():
-            spacy.cli.download("en_core_web_sm")
-            return spacy.load("en_core_web_sm")
+            try:
+                return spacy.load("en_core_web_sm")
+            except OSError:
+                spacy.cli.download("en_core_web_sm")
+                return spacy.load("en_core_web_sm")
 
         nlp = get_model()
+        
+        doc = nlp(text_input)
 
         if st.button("Submit"):
             if text_input:
@@ -64,9 +69,12 @@ def main():
 
         @st.cache_resource()
         def get_model():
-            spacy.cli.download("en_core_web_sm")
-            return spacy.load("en_core_web_sm")
-        
+            try:
+                return spacy.load("en_core_web_sm")
+            except OSError:
+                spacy.cli.download("en_core_web_sm")
+                return spacy.load("en_core_web_sm")
+
         nlp = get_model()
         
         rf_model_path = os.path.join(os.path.dirname(__file__), 'model/random_forest_model.sav')
