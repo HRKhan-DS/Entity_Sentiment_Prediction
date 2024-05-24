@@ -1,10 +1,9 @@
-pandas
-numpy
-scikit-learn
-sentence-transformers
-streamlit
-spacy-streamlit
-matplotlib
-spaCy
-Pillow
-streamlit-option-menu
+pandas==2.2.2
+numpy== 1.26.4
+scikit-learn==1.5.0
+sentence-transformers==2.7.0
+streamlit== 1.35.0
+spacy-streamlit==1.0.6
+spaCy==3.7.4
+Pillow==10.3.0
+streamlit-option-menu==0.3.12

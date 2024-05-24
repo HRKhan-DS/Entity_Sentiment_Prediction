@@ -43,17 +43,19 @@ def main():
         
     elif selected == 'Entity Recognition':
         text_input = st.text_area("Enter text for analysis", "")
-
-        @st.cache_resource()
-        def get_model():
-            try:
-                return spacy.load("en_core_web_sm")
-            except OSError:
-                spacy.cli.download("en_core_web_sm")
-                return spacy.load("en_core_web_sm")
-
-        nlp = get_model()
         
+        import subprocess
+
+        @st.cache_resource
+        def download_en_core_web_sm():
+            subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+
+        # Download the 'en_core_web_sm' model if not already downloaded
+        download_en_core_web_sm()
+
+        # Load the 'en_core_web_sm' model
+        nlp = spacy.load("en_core_web_sm")
+ 
         doc = nlp(text_input)
 
         if st.button("Submit"):
