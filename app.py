@@ -44,9 +44,12 @@ def main():
     elif selected == 'Entity Recognition':
         text_input = st.text_area("Enter text for analysis", "")
 
-        nlp = spacy.load("en_core_web_sm")
+        @st.cache_resource()
+        def get_model():
+            spacy.cli.download("en_core_web_sm")
+            return spacy.load("en_core_web_sm")
 
-        doc = nlp(text_input)
+        nlp = get_model()
 
         if st.button("Submit"):
             if text_input:
@@ -61,8 +64,8 @@ def main():
 
         @st.cache_resource()
         def get_model():
-            import en_core_web_sm
-            return en_core_web_sm.load()
+            spacy.cli.download("en_core_web_sm")
+            return spacy.load("en_core_web_sm")
         
         nlp = get_model()
         
