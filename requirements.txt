@@ -1,10 +1,11 @@
-pandas==2.2.2
-numpy== 1.26.4
-scikit-learn==1.5.0
-sentence-transformers==2.7.0
-streamlit== 1.35.0
 spacy-streamlit==1.0.6
 spaCy>=3.2.0,<3.3.0
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.0
+sentence-transformers==2.7.0
+streamlit==1.35.0
 Pillow==10.3.0
 streamlit-option-menu==0.3.12
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz#egg=en_core_web_sm
+# Using the following line to ensure pip installs the model
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0.tar.gz
