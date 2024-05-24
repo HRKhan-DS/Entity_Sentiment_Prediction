@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+sentence-transformers
+streamlit
+spacy-streamlit
+matplotlib
+spaCy
+Pillow
+streamlit-option-menu
