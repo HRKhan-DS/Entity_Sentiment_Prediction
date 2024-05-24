@@ -9,11 +9,23 @@ from spacy.lang.en.stop_words import STOP_WORDS
 from PIL import Image
 import spacy_streamlit
 from streamlit_option_menu import option_menu
+import subprocess
 
 # Page setup
 st.set_page_config(page_title="Entity-Sentiment Analysis",
                    layout='wide',
                    page_icon="🤗")
+
+
+def download_en_core_web_sm():
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"], check=True)
+
+# Cache the function to prevent re-downloading the model
+@st.cache_resource
+def load_model():
+    download_en_core_web_sm()
+    return spacy.load("en_core_web_sm")
+
 
 def main():
     with st.sidebar:
@@ -43,49 +55,31 @@ def main():
         
     elif selected == 'Entity Recognition':
         text_input = st.text_area("Enter text for analysis", "")
-    
-        import subprocess
-
-        @st.cache_resource
-        def download_en_core_web_sm():
-            subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-
-        # Download the 'en_core_web_sm' model if not already downloaded
-        download_en_core_web_sm()
 
         try:
-              # Load the 'en_core_web_sm' model
-            nlp = spacy.load("en_core_web_sm")
-        
+            # Load the 'en_core_web_sm' model
+            nlp = load_model()
+
             if text_input:
                 doc = nlp(text_input)
                 entities = [(ent.text, ent.start_char, ent.end_char, ent.label_) for ent in doc.ents]
-                entity_str = ", ".join([f"{ent[0]} ({ent[1]})" for ent in entities])
+                entity_str = ", ".join([f"{ent[0]} ({ent[3]})" for ent in entities])
                 st.markdown(f"**Entity Recognition:** <span style='color:blue'>{entity_str}</span>", unsafe_allow_html=True)
             else:
                 st.write("Please enter some text for analysis.")
-        
+
             # Add the Submit button
             if st.button("Submit"):
-               pass  # You can add any additional logic here if needed
-    
+                pass  # You can add any additional logic here if needed
+
         except Exception as e:
             st.error(f"Error loading the model: {e}")
 
 
-    
     elif selected == "Sentiment Analysis":
         text_input = st.text_area("Enter text for analysis", "")
 
-        @st.cache_resource()
-        def get_model():
-            try:
-                return spacy.load("en_core_web_sm")
-            except OSError:
-                spacy.cli.download("en_core_web_sm")
-                return spacy.load("en_core_web_sm")
-
-        nlp = get_model()
+        nlp = load_model()
         
         rf_model_path = os.path.join(os.path.dirname(__file__), 'model/random_forest_model.sav')
         rf_model = pickle.load(open(rf_model_path, 'rb')) 
