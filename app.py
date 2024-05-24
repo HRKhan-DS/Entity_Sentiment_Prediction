@@ -43,7 +43,7 @@ def main():
         
     elif selected == 'Entity Recognition':
         text_input = st.text_area("Enter text for analysis", "")
-        
+    
         import subprocess
 
         @st.cache_resource
@@ -53,18 +53,26 @@ def main():
         # Download the 'en_core_web_sm' model if not already downloaded
         download_en_core_web_sm()
 
-        # Load the 'en_core_web_sm' model
-        nlp = spacy.load("en_core_web_sm")
- 
-        doc = nlp(text_input)
-
-        if st.button("Submit"):
+        try:
+              # Load the 'en_core_web_sm' model
+            nlp = spacy.load("en_core_web_sm")
+        
             if text_input:
+                doc = nlp(text_input)
                 entities = [(ent.text, ent.start_char, ent.end_char, ent.label_) for ent in doc.ents]
                 entity_str = ", ".join([f"{ent[0]} ({ent[1]})" for ent in entities])
                 st.markdown(f"**Entity Recognition:** <span style='color:blue'>{entity_str}</span>", unsafe_allow_html=True)
             else:
                 st.write("Please enter some text for analysis.")
+        
+            # Add the Submit button
+            if st.button("Submit"):
+               pass  # You can add any additional logic here if needed
+    
+        except Exception as e:
+            st.error(f"Error loading the model: {e}")
+
+
     
     elif selected == "Sentiment Analysis":
         text_input = st.text_area("Enter text for analysis", "")
