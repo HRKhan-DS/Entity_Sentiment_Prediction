@@ -7,30 +7,45 @@ from sentence_transformers import SentenceTransformer
 import string
 from spacy.lang.en.stop_words import STOP_WORDS
 from PIL import Image
-import spacy_streamlit
 from streamlit_option_menu import option_menu
-import subprocess
+from spacy.cli.download import download as spacy_download
 
 # Page setup
 st.set_page_config(page_title="Entity-Sentiment Analysis",
                    layout='wide',
                    page_icon="🤗")
 
-
-from spacy.cli.download import download as spacy_download
-
 # Cache the function to prevent re-downloading the model
 @st.cache_resource
 def load_model():
-    # Attempt to load the model
     try:
         nlp = spacy.load("en_core_web_sm")
     except OSError:
-        # If the model is not found, download and then load it
         spacy_download("en_core_web_sm")
         nlp = spacy.load("en_core_web_sm")
     return nlp
 
+@st.cache_resource
+def load_sentence_transformer_model():
+    return SentenceTransformer('all-MiniLM-L6-v2')
+
+@st.cache_resource
+def load_rf_model():
+    rf_model_path = os.path.join(os.path.dirname(__file__), 'model/random_forest_model.sav')
+    with open(rf_model_path, 'rb') as file:
+        rf_model = pickle.load(file)
+    return rf_model
+
+def clean_text(text):
+    pattern = r"[^a-zA-Z\s]+"
+    cleaned_text = re.sub(pattern, ' ', text)
+    return cleaned_text.lower()
+
+def spacy_token(nlp, sentence):
+    doc = nlp(sentence)
+    mytokens = [word.lemma_.lower().strip() for word in doc]
+    mytokens = [word for word in mytokens if word not in STOP_WORDS and word not in string.punctuation]
+    return " ".join(mytokens)
 
 def main():
     with st.sidebar:
@@ -60,12 +75,10 @@ def main():
         
     elif selected == 'Entity Recognition':
         text_input = st.text_area("Enter text for analysis", "")
-
-        try:
-            # Load the 'en_core_web_sm' model
-            nlp = load_model()
-
+        
+        if st.button("Submit"):
             if text_input:
+                nlp = load_model()
                 doc = nlp(text_input)
                 entities = [(ent.text, ent.start_char, ent.end_char, ent.label_) for ent in doc.ents]
                 entity_str = ", ".join([f"{ent[0]} ({ent[3]})" for ent in entities])
@@ -73,40 +86,17 @@ def main():
             else:
                 st.write("Please enter some text for analysis.")
 
-            # Add the Submit button
-            if st.button("Submit"):
-                pass  # You can add any additional logic here if needed
-
-        except Exception as e:
-            st.error(f"Error loading the model: {e}")
-
-
     elif selected == "Sentiment Analysis":
         text_input = st.text_area("Enter text for analysis", "")
-
-        nlp = load_model()
-        
-        rf_model_path = os.path.join(os.path.dirname(__file__), 'model/random_forest_model.sav')
-        rf_model = pickle.load(open(rf_model_path, 'rb')) 
-        
-        sn_model_path = os.path.join(os.path.dirname(__file__), 'model/sentence_trans_model.sav')
-        sn_model = pickle.load(open(sn_model_path, 'rb'))
-        
-        def clean_text(text):
-            pattern = r"[^a-zA-Z]+|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
-            cleaned_text = re.sub(pattern, ' ', text)
-            return cleaned_text.lower()
-
-        def spacy_token(sentence):
-            doc = nlp(sentence)
-            mytokens = [word.lemma_.lower().strip() for word in doc]
-            mytokens = [word for word in mytokens if word not in STOP_WORDS and word not in string.punctuation]
-            return " ".join(mytokens)
         
         if st.button("Submit"):
             if text_input:
+                nlp = load_model()
+                sn_model = load_sentence_transformer_model()
+                rf_model = load_rf_model()
+                
                 cleaned_text = clean_text(text_input)
-                spacy_text = spacy_token(cleaned_text)
+                spacy_text = spacy_token(nlp, cleaned_text)
                 embeddings = sn_model.encode([spacy_text])
                 prediction = rf_model.predict(embeddings)
                 
@@ -122,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
