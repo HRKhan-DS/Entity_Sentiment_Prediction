@@ -71,18 +71,18 @@ def main():
                 st.components.v1.html(html, height=200)
             
             else:
-                st.write("Please enter some text for analysis.")
+                st.write("Please enter some text for Entity Recognition.")
 
             # Add the Submit button
             if st.button("Submit"):
-                pass  # You can add any additional logic here if needed
+                pass
 
         except Exception as e:
             st.error(f"Error loading the model: {e}")
 
 
     elif selected == "Sentiment Analysis":
-        text_input = st.text_area("Enter text for analysis", "")
+        text_input = st.text_area("Enter text for sentiment analysis", "")
 
         nlp = load_model()
         
@@ -118,7 +118,7 @@ def main():
                     img = Image.open(img_path)
                     st.image(img, width=100)
             else:
-                st.write("Please enter some text for analysis.")
+                st.write("Please enter some text for sentiment analysis.")
 
 if __name__ == "__main__":
     main()
