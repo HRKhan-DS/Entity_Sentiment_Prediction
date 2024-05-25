@@ -66,9 +66,9 @@ def main():
 
             if text_input:
                 doc = nlp(text_input)
-                # Use displacy to visualize entity recognition
-                html = displacy.render(doc, style="ent", page=True)
-                st.components.v1.html(html, height=600)
+                # Use displacy to visualize entity recognition with reduced gap
+                html = displacy.render(doc, style="ent", page=True, options={"distance": 0})  # Adjust distance parameter
+                st.components.v1.html(html, height=200)
             
             else:
                 st.write("Please enter some text for analysis.")
