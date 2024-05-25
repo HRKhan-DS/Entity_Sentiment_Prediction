@@ -9,7 +9,7 @@ from spacy.lang.en.stop_words import STOP_WORDS
 from PIL import Image
 import spacy_streamlit
 from streamlit_option_menu import option_menu
-import subprocess
+from spacy import displacy
 
 # Page setup
 st.set_page_config(page_title="Entity-Sentiment Analysis",
@@ -59,17 +59,17 @@ def main():
         st.write("By identifying and analyzing sentiments at the entity level, businesses can gain deeper insights into customer opinions and make informed decisions.")
         
     elif selected == 'Entity Recognition':
-        text_input = st.text_area("Enter text for analysis", "")
+        text_input = st.text_area("Enter text for Entity Recognition", "")
 
         try:
-            # Load the 'en_core_web_sm' model
             nlp = load_model()
 
             if text_input:
                 doc = nlp(text_input)
-                entities = [(ent.text, ent.start_char, ent.end_char, ent.label_) for ent in doc.ents]
-                entity_str = ", ".join([f"{ent[0]} ({ent[3]})" for ent in entities])
-                st.markdown(f"**Entity Recognition:** <span style='color:blue'>{entity_str}</span>", unsafe_allow_html=True)
+                # Use displacy to visualize entity recognition
+                html = displacy.render(doc, style="ent", page=True)
+                st.components.v1.html(html, height=600)
+            
             else:
                 st.write("Please enter some text for analysis.")
 
