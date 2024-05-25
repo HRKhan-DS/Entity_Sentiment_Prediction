@@ -49,7 +49,7 @@ def main():
     img_path = os.path.join(os.path.dirname(__file__), 'static/pic_for_display_01.jpg')
     if os.path.exists(img_path):
         img = Image.open(img_path)
-        st.image(img, width=800)
+        st.image(img)
 
     if selected == 'Description':
         st.subheader("Description")
