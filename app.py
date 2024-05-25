@@ -24,11 +24,11 @@ from spacy.cli.download import download as spacy_download
 def load_model():
     # Attempt to load the model
     try:
-        nlp = spacy.load("en_core_web_sm")
+        nlp = spacy.load("en_core_web_md")
     except OSError:
         # If the model is not found, download and then load it
-        spacy_download("en_core_web_sm")
-        nlp = spacy.load("en_core_web_sm")
+        spacy_download("en_core_web_md")
+        nlp = spacy.load("en_core_web_md")
     return nlp
 
 

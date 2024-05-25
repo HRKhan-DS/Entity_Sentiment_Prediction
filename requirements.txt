@@ -8,4 +8,4 @@ streamlit==1.35.0
 Pillow==10.3.0
 streamlit-option-menu==0.3.12
 # Using the following line to ensure pip installs the model
-en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0.tar.gz
+en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.2.0/en_core_web_md-3.2.0.tar.gz
