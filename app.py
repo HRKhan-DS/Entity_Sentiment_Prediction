@@ -2,22 +2,25 @@ import streamlit as st
 import pickle
 import os
 import re
-import spacy
+
+try:
+    import spacy
+    from spacy.cli.download import download as spacy_download
+    from spacy import displacy
+    from spacy.lang.en.stop_words import STOP_WORDS
+except ImportError as e:
+    st.error(f"Error importing SpaCy: {e}. Please ensure SpaCy is correctly installed.")
+
 from sentence_transformers import SentenceTransformer
 import string
-from spacy.lang.en.stop_words import STOP_WORDS
 from PIL import Image
 import spacy_streamlit
 from streamlit_option_menu import option_menu
-from spacy import displacy
 
 # Page setup
 st.set_page_config(page_title="Entity-Sentiment Analysis",
                    layout='wide',
                    page_icon="🤗")
-
-
-from spacy.cli.download import download as spacy_download
 
 # Cache the function to prevent re-downloading the model
 @st.cache_resource
@@ -30,7 +33,6 @@ def load_model():
         spacy_download("en_core_web_md")
         nlp = spacy.load("en_core_web_md")
     return nlp
-
 
 def main():
     with st.sidebar:
@@ -67,7 +69,7 @@ def main():
             if text_input:
                 doc = nlp(text_input)
                 # Use displacy to visualize entity recognition with reduced gap
-                html = displacy.render(doc, style="ent", page=True, options={"distance": 0})  # Adjust distance parameter
+                html = displacy.render(doc, style="ent", page=True, options={"distance": 90})  # Adjust distance parameter
                 st.components.v1.html(html, height=200)
             
             else:
@@ -80,17 +82,20 @@ def main():
         except Exception as e:
             st.error(f"Error loading the model: {e}")
 
-
     elif selected == "Sentiment Analysis":
         text_input = st.text_area("Enter text for sentiment analysis", "")
 
-        nlp = load_model()
+        try:
+            nlp = load_model()
         
-        rf_model_path = os.path.join(os.path.dirname(__file__), 'model/random_forest_model.sav')
-        rf_model = pickle.load(open(rf_model_path, 'rb')) 
-        
-        sn_model_path = os.path.join(os.path.dirname(__file__), 'model/sentence_trans_model.sav')
-        sn_model = pickle.load(open(sn_model_path, 'rb'))
+            rf_model_path = os.path.join(os.path.dirname(__file__), 'model/random_forest_model.sav')
+            sn_model_path = os.path.join(os.path.dirname(__file__), 'model/sentence_trans_model.sav')
+            
+            rf_model = pickle.load(open(rf_model_path, 'rb'))
+            sn_model = SentenceTransformer(sn_model_path)
+        except Exception as e:
+            st.error(f"Error loading the sentiment analysis models: {e}")
+            return
         
         def clean_text(text):
             pattern = r"[^a-zA-Z]+|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
@@ -122,3 +127,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
